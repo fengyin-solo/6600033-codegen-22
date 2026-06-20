@@ -256,9 +256,9 @@ function safeEval(expression: string, values: Record<string, number | null>): { 
     if (/[^a-zA-Z0-9_+\-*/%().\s,]/g.test(sanitized.replace(/__fn_[a-z0-9]+/gi, ''))) {
       return { value: null, error: '表达式包含非法字符' }
     }
-    const fnArgs = Object.keys(varObj).concat(Object.keys(SAFE_CONSTANTS))
-    const fnVals = Object.values(varObj).concat(Object.values(SAFE_CONSTANTS))
-    for (const k of Object.keys(SAFE_FUNCTIONS)) { fnArgs.push(`__fn_${k}`); fnVals.push(SAFE_FUNCTIONS[k as keyof typeof SAFE_FUNCTIONS]) }
+    const fnArgs: string[] = Object.keys(varObj).concat(Object.keys(SAFE_CONSTANTS))
+    const fnVals: unknown[] = Object.values(varObj).concat(Object.values(SAFE_CONSTANTS))
+    for (const k of Object.keys(SAFE_FUNCTIONS)) { fnArgs.push(`__fn_${k}`); fnVals.push(SAFE_FUNCTIONS[k as keyof typeof SAFE_FUNCTIONS] as unknown) }
     const body = `'use strict'; return (${sanitized});`
     const result = new Function(...fnArgs, body)(...fnVals)
     if (typeof result !== 'number' || !isFinite(result)) return { value: null, error: '计算结果无效' }
